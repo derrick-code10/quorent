@@ -1,0 +1,2 @@
+# quorent
+AI News Assistant
