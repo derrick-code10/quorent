@@ -9,5 +9,12 @@ from app.models.conversation import (
     ChatRequest,
     ChatResponse
 )
+from app.models.email_digest import (
+    EmailDigestResponse, 
+    EmailDigestListResponse, 
+    DigestArticle, 
+    EmailDigestListItem
+)
+    
 
-__all__ = ["UserResponse", "UserUpdate", "ArticleResponse", "ArticleListItem", "ConversationListItem", "ConversationResponse", "ConversationListResponse", "Message", "ChatRequest", "ChatResponse"]
+__all__ = ["UserResponse", "UserUpdate", "ArticleResponse", "ArticleListItem", "ConversationListItem", "ConversationResponse", "ConversationListResponse", "Message", "ChatRequest", "ChatResponse", "EmailDigestResponse", "EmailDigestListResponse", "DigestArticle", "EmailDigestListItem"]
