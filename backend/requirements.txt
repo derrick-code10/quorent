@@ -1,0 +1,11 @@
+# FastAPI and server
+fastapi==0.122.0
+uvicorn==0.38.0
+python-multipart==0.0.20
+
+# Database
+supabase==2.24.0
+
+# Environment variables
+python-dotenv==1.2.1
+pydantic-settings==2.4.0
