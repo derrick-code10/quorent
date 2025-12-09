@@ -6,6 +6,9 @@ python-multipart==0.0.20
 # Database
 supabase==2.24.0
 
+# OPENAI
+openai==2.6.1
+
 # Environment variables
 python-dotenv==1.2.1
 pydantic-settings==2.4.0
