@@ -8,6 +8,12 @@ class Settings(BaseSettings):
     # Supabase
     supabase_url: str
     supabase_key: str
+
+    # OpenAI
+    openai_api_key: str
+
+    #NewsAPI
+    newsai_api_key: str
     
     # Server
     environment: str = "development"
