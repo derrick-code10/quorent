@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     # Supabase
     supabase_url: str
     supabase_key: str
+    supabase_service_key: str
 
     # OpenAI
     openai_api_key: str

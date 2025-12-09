@@ -13,7 +13,7 @@ def get_db() -> Client:
     """
     return create_client(
         settings.supabase_url,
-        settings.supabase_key
+        settings.supabase_service_key
     )
 
 def get_user_db(token: str) -> Client:
