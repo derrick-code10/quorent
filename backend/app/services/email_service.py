@@ -139,20 +139,31 @@ def send_digest_email(
         articles_json = digest_data.get("articles", [])
         articles = parse_articles_from_digest(articles_json)
         
+        # Limit articles for email display (keep all in database for chat/search)
+        email_display_limit = settings.email_display_max_articles
+        articles_for_email = articles[:email_display_limit]
+        
+        # Log if we're limiting
+        if len(articles) > email_display_limit:
+            logger.info(
+                f"Limiting email display to {email_display_limit} articles "
+                f"(out of {len(articles)} total in digest {digest_id})"
+            )
+        
         # Render email templates
         summary = digest_data.get("summary")
         fallback_type = digest_data.get("fallback_type")
         from_name = settings.resend_from_name
         
         html_content = _render_digest_html(
-            articles=articles,
+            articles=articles_for_email,  
             summary=summary,
             fallback_type=fallback_type,
             from_name=from_name
         )
         
         text_content = _render_digest_text(
-            articles=articles,
+            articles=articles_for_email,  
             summary=summary,
             fallback_type=fallback_type,
             from_name=from_name

@@ -120,7 +120,7 @@ async def create_digests(
                 result = await create_digest_for_user(
                     user_id=user_id,
                     interests=interests,
-                    max_articles=settings.digest_max_articles
+                    max_articles=50
                 )
                 
                 if result["success"]:

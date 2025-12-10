@@ -25,7 +25,7 @@ class Settings(BaseSettings):
 
     # Cron
     cron_secret_token: str
-    digest_max_articles: int
+    email_display_max_articles: int = 10 
     
     # Server
     environment: str = "development"
