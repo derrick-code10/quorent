@@ -1,5 +1,6 @@
 """Application configuration using pydantic-settings."""
 from pydantic_settings import BaseSettings
+from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -15,6 +16,12 @@ class Settings(BaseSettings):
 
     #NewsAPI
     newsai_api_key: str
+
+    # Resend
+    resend_api_key: str
+    resend_from_email: str
+    resend_from_name: str = "Quorent"
+    resend_reply_to: Optional[str] = None
     
     # Server
     environment: str = "development"

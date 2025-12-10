@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Daily Digest</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    "
+  >
+    <table role="presentation" style="width: 100%; border-collapse: collapse">
+      <tr>
+        <td style="padding: 0">
+          <table
+            role="presentation"
+            style="
+              width: 100%;
+              max-width: 600px;
+              margin: 0 auto;
+              background-color: #ffffff;
+              border-collapse: collapse;
+            "
+          >
+            <tr>
+              <td style="padding: 30px 20px">
+                <h2
+                  style="
+                    margin: 0 0 20px 0;
+                    color: #333333;
+                    font-size: 20px;
+                    text-align: center;
+                  "
+                >
+                  Your Daily News Digest
+                </h2>
+                {% if fallback_type %}
+                <p
+                  style="
+                    margin: 0 0 20px 0;
+                    color: #666666;
+                    font-size: 14px;
+                    padding: 10px;
+                    background-color: #fff3cd;
+                    border-left: 4px solid #ffc107;
+                  "
+                >
+                  {% if fallback_type == 'cache' %}
+                  <strong>Note:</strong> This digest contains cached articles
+                  from previous days. {% elif fallback_type == 'no_data' %}
+                  <strong>Note:</strong> We couldn't find new articles matching
+                  your interests at this time. {% endif %}
+                </p>
+                {% endif %} {% if summary %}
+                <div
+                  style="
+                    margin: 0 0 30px 0;
+                    padding: 20px;
+                    background-color: #f8f9fa;
+                    border-radius: 4px;
+                  "
+                >
+                  <h3
+                    style="margin: 0 0 10px 0; color: #333333; font-size: 18px"
+                  >
+                    Summary
+                  </h3>
+                  <p
+                    style="
+                      margin: 0;
+                      color: #555555;
+                      font-size: 14px;
+                      line-height: 1.6;
+                    "
+                  >
+                    {{ summary }}
+                  </p>
+                </div>
+                {% endif %} {% if articles %}
+                <h3 style="margin: 0 0 20px 0; color: #333333; font-size: 18px">
+                  Articles ({{ articles|length }})
+                </h3>
+                {% for article in articles %}
+                <div
+                  style="
+                    margin: 0 0 30px 0;
+                    padding-bottom: 30px;
+                    border-bottom: 1px solid #e0e0e0;
+                  "
+                >
+                  {% if article.image_url %}
+                  <img
+                    src="{{ article.image_url }}"
+                    alt="{{ article.title }}"
+                    style="
+                      width: 100%;
+                      max-width: 100%;
+                      height: auto;
+                      margin-bottom: 15px;
+                      border-radius: 4px;
+                    "
+                  />
+                  {% endif %}
+                  <h4
+                    style="margin: 0 0 10px 0; color: #333333; font-size: 16px"
+                  >
+                    <a
+                      href="{{ article.url }}"
+                      style="color: #007bff; text-decoration: none"
+                      >{{ article.title }}</a
+                    >
+                  </h4>
+                  {% if article.description %}
+                  <p
+                    style="
+                      margin: 0 0 10px 0;
+                      color: #666666;
+                      font-size: 14px;
+                      line-height: 1.5;
+                    "
+                  >
+                    {{ article.description | truncate(250) }}
+                  </p>
+                  {% endif %}
+                  <div style="margin-top: 10px">
+                    {% if article.source %}
+                    <span
+                      style="
+                        color: #999999;
+                        font-size: 12px;
+                        margin-right: 10px;
+                      "
+                      >Source: {{ article.source }}</span
+                    >
+                    {% endif %} {% if article.published_at %}
+                    <span style="color: #999999; font-size: 12px"
+                      >{{ article.published_at | format_date }}</span
+                    >
+                    {% endif %}
+                  </div>
+                  <a
+                    href="{{ article.url }}"
+                    style="
+                      display: inline-block;
+                      margin-top: 10px;
+                      padding: 10px 20px;
+                      background-color: #007bff;
+                      color: #ffffff;
+                      text-decoration: none;
+                      border-radius: 4px;
+                      font-size: 14px;
+                    "
+                    >Read Article</a
+                  >
+                </div>
+                {% endfor %} {% else %}
+                <p
+                  style="
+                    margin: 0;
+                    color: #666666;
+                    font-size: 14px;
+                    line-height: 1.6;
+                  "
+                >
+                  No articles available in this digest. We'll keep looking for
+                  content that matches your interests!
+                </p>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td
+          style="padding: 20px; text-align: center; background-color: #f8f9fa"
+        >
+          <p style="margin: 0; color: #999999; font-size: 12px">
+            You're receiving this email because you have email digests
+            enabled.<br />
+            <!-- Unsubscribe link placeholder for future implementation -->
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

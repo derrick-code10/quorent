@@ -4,41 +4,10 @@ from datetime import datetime
 from app.core.database import get_db
 from app.services.news_service import fetch_and_store_news_for_user, get_cached_articles
 from app.services.summarization_service import generate_digest_summary
-from app.models.email_digest import DigestArticle
+from app.utils.article_utils import transform_to_digest_article
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-def _transform_to_digest_article(article: Dict[str, Any]) -> DigestArticle:
-    """
-    Transform a full article dict to a simplified DigestArticle.
-    
-    Args:
-        article: Full article dictionary
-        
-    Returns:
-        DigestArticle model
-    """
-    # Handle published_at conversion
-    published_at = None
-    if article.get("published_at"):
-        if isinstance(article["published_at"], str):
-            try:
-                published_at = datetime.fromisoformat(article["published_at"].replace("Z", "+00:00"))
-            except:
-                pass
-        elif isinstance(article["published_at"], datetime):
-            published_at = article["published_at"]
-    
-    return DigestArticle(
-        title=article.get("title", ""),
-        url=article.get("url", ""),
-        description=article.get("description"),
-        source=article.get("source"),
-        published_at=published_at,
-        image_url=article.get("image_url")
-    )
 
 
 async def create_digest_for_user(
@@ -231,8 +200,15 @@ async def create_digest_for_user(
             }
         
         # Transform articles to digest format
-        digest_articles = [_transform_to_digest_article(article) for article in articles]
-        articles_json = [article.model_dump() for article in digest_articles]
+        digest_articles = [transform_to_digest_article(article) for article in articles]
+        # Serialize articles to JSON-compatible format
+        articles_json = []
+        for article in digest_articles:
+            article_dict = article.model_dump()
+            # Convert datetime to ISO format string if present
+            if article_dict.get("published_at") and isinstance(article_dict["published_at"], datetime):
+                article_dict["published_at"] = article_dict["published_at"].isoformat()
+            articles_json.append(article_dict)
         
         # Generate summary
         summary = None
