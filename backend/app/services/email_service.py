@@ -139,11 +139,10 @@ def send_digest_email(
         articles_json = digest_data.get("articles", [])
         articles = parse_articles_from_digest(articles_json)
         
-        # Limit articles for email display (keep all in database for chat/search)
+        # Limit articles for email display
         email_display_limit = settings.email_display_max_articles
         articles_for_email = articles[:email_display_limit]
         
-        # Log if we're limiting
         if len(articles) > email_display_limit:
             logger.info(
                 f"Limiting email display to {email_display_limit} articles "

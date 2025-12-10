@@ -168,8 +168,11 @@ async def send_digests(
     If digest_ids is provided, sends those specific digests.
     Otherwise, finds all queued digests and sends them.
     
+    Returns immediately and processes emails in background.
     Protected by secret token.
     """
+    import asyncio
+    
     db = get_db()
     
     try:
@@ -192,15 +195,45 @@ async def send_digests(
                 "success": True,
                 "sent": 0,
                 "failed": 0,
-                "errors": []
+                "queued": 0,
+                "message": "No digests to send"
             }
         
-        sent_count = 0
-        failed_count = 0
-        errors = []
+        # Return immediately to avoid timeout
+        # Process emails in background
+        logger.info(f"Queuing {len(digests_to_send)} digests for sending")
         
-        # Process each digest
-        for digest_id in digests_to_send:
+        # Schedule background processing
+        asyncio.create_task(_process_digests_async(digests_to_send))
+        
+        return {
+            "success": True,
+            "queued": len(digests_to_send),
+            "message": f"Processing {len(digests_to_send)} digests in background"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in send-digests cron job: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to queue digests: {str(e)}"
+        )
+
+
+async def _process_digests_async(digest_ids: List[str]):
+    """Process digest emails asynchronously in background."""
+    import asyncio
+    
+    db = get_db()
+    sent_count = 0
+    failed_count = 0
+    
+    # Process emails with limited concurrency to avoid overwhelming
+    semaphore = asyncio.Semaphore(3) 
+    
+    async def send_single_digest(digest_id: str):
+        nonlocal sent_count, failed_count
+        async with semaphore:
             try:
                 # Get digest and user info
                 digest_response = (
@@ -212,11 +245,8 @@ async def send_digests(
                 
                 if not digest_response.data:
                     failed_count += 1
-                    errors.append({
-                        "digest_id": digest_id,
-                        "error": "Digest not found"
-                    })
-                    continue
+                    logger.warning(f"Digest {digest_id} not found")
+                    return
                 
                 user_id = digest_response.data[0]["user_id"]
                 
@@ -230,21 +260,21 @@ async def send_digests(
                 
                 if not user_response.data:
                     failed_count += 1
-                    errors.append({
-                        "digest_id": digest_id,
-                        "error": "User not found"
-                    })
-                    continue
+                    logger.warning(f"User not found for digest {digest_id}")
+                    return
                 
                 user_email = user_response.data[0]["email"]
                 user_name = user_response.data[0].get("full_name")
                 
-                # Send digest
-                result = send_digest_email(
-                    digest_id=digest_id,
-                    user_id=user_id,
-                    user_email=user_email,
-                    user_name=user_name
+                # Run synchronous email send in thread pool
+                loop = asyncio.get_event_loop()
+                result = await loop.run_in_executor(
+                    None,
+                    send_digest_email,
+                    digest_id,
+                    user_id,
+                    user_email,
+                    user_name
                 )
                 
                 if result["success"]:
@@ -252,35 +282,16 @@ async def send_digests(
                     logger.info(f"Sent digest {digest_id} to {user_email}")
                 else:
                     failed_count += 1
-                    errors.append({
-                        "digest_id": digest_id,
-                        "error": result.get("error", "Unknown error")
-                    })
                     logger.warning(f"Failed to send digest {digest_id}: {result.get('error')}")
                     
             except Exception as e:
-                error_msg = str(e)
                 failed_count += 1
-                errors.append({
-                    "digest_id": digest_id,
-                    "error": error_msg
-                })
                 logger.error(f"Error sending digest {digest_id}: {e}")
-                continue
-        
-        return {
-            "success": True,
-            "sent": sent_count,
-            "failed": failed_count,
-            "errors": errors
-        }
-        
-    except Exception as e:
-        logger.error(f"Error in send-digests cron job: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to send digests: {str(e)}"
-        )
+    
+    # Process all digests concurrently
+    await asyncio.gather(*[send_single_digest(did) for did in digest_ids])
+    
+    logger.info(f"Completed processing digests: {sent_count} sent, {failed_count} failed")
 
 @router.post("/cleanup")
 async def cleanup_old_cache(
