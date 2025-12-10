@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     resend_from_email: str
     resend_from_name: str = "Quorent"
     resend_reply_to: Optional[str] = None
+
+    # Cron
+    cron_secret_token: str
     
     # Server
     environment: str = "development"
