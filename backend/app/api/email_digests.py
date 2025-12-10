@@ -7,7 +7,8 @@ from app.models.email_digest import (
     EmailDigestListItem,
     EmailDigestListResponse,
     EmailDigestResponse,
-    DigestArticle
+    DigestArticle,
+    SendDigestResponse
 )
 from typing import Optional
 import logging
@@ -190,4 +191,65 @@ async def get_email_digest(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch email digest: {str(e)}"
+        )
+
+
+@router.post("/{digest_id}/send", response_model=SendDigestResponse)
+async def send_email_digest(
+    digest_id: str,
+    current_user: dict = Depends(get_current_user),
+    credentials = Depends(security)
+):
+    """
+    Send an email digest to the current user.
+    Only digests with status 'queued' can be sent.
+    """
+    user_id = current_user["id"]
+    user_email = current_user["email"]
+    token = credentials.credentials
+    
+    try:
+        user_db = get_user_db(token)
+        
+        # Check if user has email digests enabled
+        user_response = user_db.table("users").select("email_digest_enabled").eq("id", user_id).execute()
+        
+        if user_response.data and len(user_response.data) > 0:
+            email_digest_enabled = user_response.data[0].get("email_digest_enabled", True)
+            if not email_digest_enabled:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email digests are disabled for this user"
+                )
+        
+        # Import here to avoid circular imports
+        from app.services.email_service import send_digest_email
+        
+        # Send the email
+        result = send_digest_email(
+            digest_id=digest_id,
+            user_id=user_id,
+            user_email=user_email,
+            user_name=current_user.get("user_metadata", {}).get("full_name")
+        )
+        
+        if result["success"]:
+            return SendDigestResponse(
+                success=True,
+                message="Email digest sent successfully",
+                email_id=result.get("email_id")
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to send email: {result.get('error', 'Unknown error')}"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error sending email digest {digest_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to send email digest: {str(e)}"
         )

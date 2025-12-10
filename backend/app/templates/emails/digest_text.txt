@@ -1,0 +1,31 @@
+{{ from_name }} - Your Daily News Digest
+
+{% if fallback_type %}
+{% if fallback_type == 'cache' %}
+Note: This digest contains cached articles from previous days.
+{% elif fallback_type == 'no_data' %}
+Note: We couldn't find new articles matching your interests at this time.
+{% endif %}
+
+{% endif %}
+{% if summary %}
+SUMMARY
+{{ summary }}
+
+{% endif %}
+{% if articles %}
+ARTICLES ({{ articles|length }})
+{% for article in articles %}
+{{ article.title }}
+{% if article.url %}{{ article.url }}{% endif %}
+{% if article.description %}{{ article.description | truncate(250) }}{% endif %}
+{% if article.source %}Source: {{ article.source }}{% endif %}
+{% if article.published_at %}Published: {{ article.published_at | format_date }}{% endif %}
+
+{% endfor %}
+{% else %}
+No articles available in this digest. We'll keep looking for content that matches your interests!
+{% endif %}
+
+---
+You're receiving this email because you have email digests enabled.

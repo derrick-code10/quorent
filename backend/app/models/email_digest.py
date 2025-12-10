@@ -48,3 +48,9 @@ class EmailDigestListResponse(BaseModel):
     limit: int
     offset: int
     has_more: bool
+
+class SendDigestResponse(BaseModel):
+    """Response model for sending email digest."""
+    success: bool
+    message: str
+    email_id: Optional[str] = None
