@@ -281,3 +281,62 @@ async def send_digests(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to send digests: {str(e)}"
         )
+
+@router.post("/cleanup")
+async def cleanup_old_cache(
+    _token_verified: bool = Depends(verify_cron_token)
+) -> Dict[str, Any]:
+    """
+    Manually trigger cleanup of old cache entries.
+    Deletes news_cache entries older than 7 days.
+    
+    Protected by secret token.
+    """
+    db = get_db()
+    
+    try:
+        from datetime import datetime, timedelta
+        
+        # Calculate date to delete (7 days ago)
+        cutoff_date = (datetime.utcnow() - timedelta(days=7)).isoformat()
+        
+        # Count entries to delete
+        count_response = (
+            db.table("news_cache")
+            .select("id")
+            .lt("created_at", cutoff_date)
+            .execute()
+        )
+        
+        entries_to_delete = count_response.data or []
+        deleted_count = len(entries_to_delete)
+        
+        if deleted_count == 0:
+            return {
+                "success": True,
+                "deleted": 0,
+                "message": "No old cache entries to clean up"
+            }
+        
+        # Delete old entries
+        delete_response = (
+            db.table("news_cache")
+            .delete()
+            .lt("created_at", cutoff_date)
+            .execute()
+        )
+        
+        logger.info(f"Cleaned up {deleted_count} cache entries older than 7 days")
+        
+        return {
+            "success": True,
+            "deleted": deleted_count,
+            "message": f"Successfully cleaned up {deleted_count} cache entries"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in cleanup cron job: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to cleanup old cache: {str(e)}"
+        )
