@@ -1,10 +1,11 @@
 """Cron job endpoints for scheduled tasks."""
-from fastapi import APIRouter, Depends, HTTPException, status, Header
+from fastapi import APIRouter, Depends, HTTPException, status, Header, Body
 from app.core.database import get_db
 from app.services.email_digest_service import create_digest_for_user
 from app.services.email_service import send_digest_email
 from app.core.config import settings
 from typing import List, Dict, Any, Optional
+from pydantic import BaseModel
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,10 +23,20 @@ async def verify_cron_token(x_cron_token: str = Header(..., alias="X-Cron-Token"
     return True
 
 
+class CreateDigestsRequest(BaseModel):
+    """Request model for creating digests."""
+    user_ids: Optional[List[str]] = None
+
+
+class SendDigestsRequest(BaseModel):
+    """Request model for sending digests."""
+    digest_ids: Optional[List[str]] = None
+
+
 @router.post("/create-digests")
 async def create_digests(
-    _token_verified: bool = Depends(verify_cron_token),
-    user_ids: Optional[List[str]] = None
+    request: CreateDigestsRequest = Body(default=CreateDigestsRequest()),
+    _token_verified: bool = Depends(verify_cron_token)
 ) -> Dict[str, Any]:
     """
     Create email digests for users who are due.
@@ -40,8 +51,8 @@ async def create_digests(
     
     try:
         # If user_ids provided, use them; otherwise find due users
-        if user_ids:
-            users_to_process = user_ids
+        if request.user_ids:
+            users_to_process = request.user_ids
         else:
             # Find users due for digests
             users_response = (
@@ -148,8 +159,8 @@ async def create_digests(
 
 @router.post("/send-digests")
 async def send_digests(
-    _token_verified: bool = Depends(verify_cron_token),
-    digest_ids: Optional[List[str]] = None
+    request: SendDigestsRequest = Body(default=SendDigestsRequest()),
+    _token_verified: bool = Depends(verify_cron_token)
 ) -> Dict[str, Any]:
     """
     Send queued email digests.
@@ -163,8 +174,8 @@ async def send_digests(
     
     try:
         # If digest_ids provided, use them; otherwise find queued digests
-        if digest_ids:
-            digests_to_send = digest_ids
+        if request.digest_ids:
+            digests_to_send = request.digest_ids
         else:
             # Find all queued digests
             digests_response = (
