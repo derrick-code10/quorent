@@ -3,3 +3,5 @@
 /dist
 /build
 .status.swp
+.env
+.DS_Store
