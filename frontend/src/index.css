@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  select,
+  label[for] {
+    cursor: pointer;
+  }
+}
+
+@theme {
+  --color-primary: #0000ee;
+
+  --color-accent: #816729;
+  --color-secondary: #512520;
+
+  --color-background: #edecec;
+  --color-surface: #f5f4f4;
+
+  --color-text-primary: #242422;
+  --color-text-muted: #6b6b69;
+
+  --color-link: #0000ee;
+
+  --font-sans: "Inter", sans-serif;
+  --font-serif: "Georgia", "Times New Roman", serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
+}
