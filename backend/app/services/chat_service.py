@@ -86,7 +86,7 @@ class SupabaseArticleRetriever(BaseRetriever):
                 "match_articles",
                 {
                     "query_embedding": query_embedding,
-                    "match_threshold": 0.7,
+                    "match_threshold": 0.35,
                     "match_count": 5,
                     "filter_user_id": self.user_id
                 }
@@ -158,8 +158,10 @@ async def generate_chat_response(
         output_key="answer"
     )
     
-    # Load conversation history into LangChain memory
-    for msg in (messages_response.data or []):
+    # Load conversation history into LangChain memory.
+    all_messages = messages_response.data or []
+    history_messages = all_messages[:-1] if all_messages and all_messages[-1]["role"] == "user" else all_messages
+    for msg in history_messages:
         if msg["role"] == "user":
             memory.chat_memory.add_user_message(msg["content"])
         elif msg["role"] == "assistant":
@@ -176,7 +178,7 @@ async def generate_chat_response(
     llm = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0.7,
-        max_tokens=1000,
+        max_tokens=1500,
         api_key=settings.openai_api_key
     )
     
