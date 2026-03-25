@@ -6,10 +6,12 @@ import { greeting, fmtDate, TODAY } from "../lib/utils";
 import DotGrid from "../components/DotGrid";
 import SectionLabel from "../components/SectionLabel";
 import DigestPanel from "../components/DigestPanel";
-import { ArticleCard, ArticlesSkeleton, EmptyArticles } from "../components/ArticleCard";
+import {
+  ArticleCard,
+  ArticlesSkeleton,
+  EmptyArticles,
+} from "../components/ArticleCard";
 import Pagination from "../components/Pagination";
-
-// ─── Page-local primitives ────────────────────────────────────────────────────
 
 function Stat({ label, value }: { label: string; value: number | null }) {
   return (
@@ -20,7 +22,9 @@ function Stat({ label, value }: { label: string; value: number | null }) {
       {value === null ? (
         <div className="h-7 w-8 bg-text-primary/10 animate-pulse ml-auto rounded" />
       ) : (
-        <p className="font-serif text-2xl font-bold text-text-primary leading-none">{value}</p>
+        <p className="font-serif text-2xl font-bold text-text-primary leading-none">
+          {value}
+        </p>
       )}
     </div>
   );
@@ -29,8 +33,12 @@ function Stat({ label, value }: { label: string; value: number | null }) {
 function DeliveryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center">
-      <dt className="font-mono text-[9px] uppercase tracking-widest text-text-muted">{label}</dt>
-      <dd className="font-mono text-[9px] uppercase font-bold text-text-primary">{value}</dd>
+      <dt className="font-mono text-[9px] uppercase tracking-widest text-text-muted">
+        {label}
+      </dt>
+      <dd className="font-mono text-[9px] uppercase font-bold text-text-primary">
+        {value}
+      </dd>
     </div>
   );
 }
@@ -53,8 +61,6 @@ function GearIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -90,7 +96,6 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background text-text-primary font-sans antialiased">
       <DotGrid />
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="border-b-4 border-text-primary bg-background sticky top-0 z-20">
         <div className="max-w-6xl mx-auto px-8">
           <div className="flex items-center py-2">
@@ -105,7 +110,10 @@ export default function Dashboard() {
             <div>
               <h1
                 className="font-serif font-bold uppercase leading-none"
-                style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", letterSpacing: "-0.025em" }}
+                style={{
+                  fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+                  letterSpacing: "-0.025em",
+                }}
               >
                 Quorent
               </h1>
@@ -150,20 +158,21 @@ export default function Dashboard() {
           </div>
 
           <div className="flex gap-6 py-2 font-mono text-[9px] uppercase tracking-[0.2em] font-bold overflow-hidden">
-            {["Today's Digest", "Your Articles", "Interests", "Delivery"].map((s) => (
-              <span
-                key={s}
-                className="hover:text-primary transition-colors cursor-default whitespace-nowrap"
-              >
-                {s}
-              </span>
-            ))}
+            {["Today's Digest", "Your Articles", "Interests", "Delivery"].map(
+              (s) => (
+                <span
+                  key={s}
+                  className="hover:text-primary transition-colors cursor-default whitespace-nowrap"
+                >
+                  {s}
+                </span>
+              ),
+            )}
           </div>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-8 py-8 relative z-10">
-        {/* ── Welcome bar ──────────────────────────────────────────────── */}
         <div className="border-b-2 border-text-primary pb-5 mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-secondary font-bold mb-1">
@@ -171,7 +180,10 @@ export default function Dashboard() {
             </p>
             <h2
               className="font-serif font-bold leading-none"
-              style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", letterSpacing: "-0.02em" }}
+              style={{
+                fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+                letterSpacing: "-0.02em",
+              }}
             >
               {greeting()},{" "}
               {loadingUser ? (
@@ -184,32 +196,43 @@ export default function Dashboard() {
           </div>
 
           <div className="hidden sm:flex items-end gap-8 shrink-0">
-            <Stat label="Articles" value={loadingArticles ? null : articleCount} />
-            <Stat label="Interests" value={loadingUser ? null : (user?.interests.length ?? 0)} />
+            <Stat
+              label="Articles"
+              value={loadingArticles ? null : articleCount}
+            />
+            <Stat
+              label="Interests"
+              value={loadingUser ? null : (user?.interests.length ?? 0)}
+            />
             <div className="text-right">
               <p className="font-mono text-[9px] uppercase tracking-widest text-text-muted mb-0.5">
                 Last Digest
               </p>
               <p className="font-serif text-sm font-bold">
-                {loadingDigest ? "—" : digest ? fmtDate(digest.created_at) : "None yet"}
+                {loadingDigest
+                  ? "—"
+                  : digest
+                    ? fmtDate(digest.created_at)
+                    : "None yet"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* ── Two-column body ───────────────────────────────────────────── */}
         <div className="grid grid-cols-12 gap-8">
-          {/* ── Left sidebar ────────────────────────────────────────────── */}
           <aside className="col-span-12 lg:col-span-4 space-y-8">
             <DigestPanel digest={digest} loading={loadingDigest} />
 
-            {/* Interests */}
             <div>
               <SectionLabel color="bg-accent">Your Interests</SectionLabel>
               {loadingUser ? (
                 <div className="flex flex-wrap gap-2">
                   {[80, 60, 95, 70].map((w, i) => (
-                    <div key={i} className="h-7 bg-text-primary/10 animate-pulse" style={{ width: w }} />
+                    <div
+                      key={i}
+                      className="h-7 bg-text-primary/10 animate-pulse"
+                      style={{ width: w }}
+                    />
                   ))}
                 </div>
               ) : user && user.interests.length > 0 ? (
@@ -224,11 +247,12 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <p className="font-sans text-sm text-text-muted">No interests configured.</p>
+                <p className="font-sans text-sm text-text-muted">
+                  No interests configured.
+                </p>
               )}
             </div>
 
-            {/* Delivery */}
             {!loadingUser && user && (
               <div>
                 <SectionLabel color="bg-primary">Delivery</SectionLabel>
@@ -238,14 +262,19 @@ export default function Dashboard() {
                     value={user.email_digest_enabled ? "Enabled" : "Disabled"}
                   />
                   {user.preferred_digest_time && (
-                    <DeliveryRow label="Time" value={user.preferred_digest_time} />
+                    <DeliveryRow
+                      label="Time"
+                      value={user.preferred_digest_time}
+                    />
                   )}
-                  <DeliveryRow label="Timezone" value={user.preferred_digest_timezone} />
+                  <DeliveryRow
+                    label="Timezone"
+                    value={user.preferred_digest_timezone}
+                  />
                 </dl>
               </div>
             )}
 
-            {/* Chat CTA */}
             <div className="border-2 border-text-primary p-5 bg-surface">
               <p className="font-mono text-[9px] uppercase tracking-widest text-secondary font-bold mb-2">
                 Meet Quill
@@ -263,10 +292,11 @@ export default function Dashboard() {
             </div>
           </aside>
 
-          {/* ── Articles feed ─────────────────────────────────────────── */}
           <section className="col-span-12 lg:col-span-8 lg:border-l-2 lg:border-text-primary lg:pl-8">
             <div className="flex items-center justify-between mb-6">
-              <SectionLabel color="bg-text-primary">Recent Articles</SectionLabel>
+              <SectionLabel color="bg-text-primary">
+                Recent Articles
+              </SectionLabel>
               {!loadingArticles && articleCount > 0 && (
                 <span className="font-mono text-[9px] uppercase tracking-widest text-text-muted -mt-4">
                   {articleCount} article{articleCount !== 1 ? "s" : ""}
@@ -289,8 +319,14 @@ export default function Dashboard() {
               <EmptyArticles />
             ) : (
               <>
-                {articles.map((article) => <ArticleCard key={article.id} article={article} />)}
-                <Pagination page={page} totalPages={totalPages} onPageChange={goToPage} />
+                {articles.map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={goToPage}
+                />
               </>
             )}
           </section>

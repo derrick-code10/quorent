@@ -44,13 +44,16 @@ function EmptyState({ onPrompt }: { onPrompt: (text: string) => void }) {
       </div>
       <h2
         className="font-serif font-bold leading-tight mb-3"
-        style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)", letterSpacing: "-0.02em" }}
+        style={{
+          fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)",
+          letterSpacing: "-0.02em",
+        }}
       >
         Ask anything about your articles.
       </h2>
       <p className="font-sans text-sm text-text-muted leading-relaxed mb-8 max-w-sm">
-        Quill draws from your personal article library to answer questions, surface trends, and
-        synthesise your reading.
+        Quill draws from your personal article library to answer questions,
+        surface trends, and synthesise your reading.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
         {prompts.map((prompt) => (
@@ -94,7 +97,6 @@ export default function Chat() {
     <div className="h-screen flex flex-col bg-background text-text-primary font-sans antialiased overflow-hidden">
       <DotGrid />
 
-      {/* ── Header ──────────────────────────────────────────────────────── */}
       <header className="border-b-4 border-text-primary bg-background z-20 shrink-0">
         <div className="px-8 py-4 flex items-center">
           <div className="flex-1" />
@@ -102,7 +104,10 @@ export default function Chat() {
           <div className="text-center">
             <h1
               className="font-serif font-bold uppercase leading-none"
-              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", letterSpacing: "-0.025em" }}
+              style={{
+                fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+                letterSpacing: "-0.025em",
+              }}
             >
               Quorent
             </h1>
@@ -112,7 +117,9 @@ export default function Chat() {
           </div>
 
           <div className="flex-1 flex items-center justify-end gap-4">
-            <p className="font-mono text-[10px] text-text-muted hidden sm:block">{TODAY}</p>
+            <p className="font-mono text-[10px] text-text-muted hidden sm:block">
+              {TODAY}
+            </p>
             <button
               onClick={() => navigate("/settings")}
               aria-label="Settings"
@@ -130,9 +137,7 @@ export default function Chat() {
         </div>
       </header>
 
-      {/* ── Body ────────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden relative z-10">
-        {/* ── Sidebar ──────────────────────────────────────────────────── */}
         <div className="w-64 shrink-0 hidden md:flex flex-col overflow-hidden">
           <ConversationList
             conversations={conversations}
@@ -144,9 +149,7 @@ export default function Chat() {
           />
         </div>
 
-        {/* ── Chat area ────────────────────────────────────────────────── */}
         <div className="flex flex-col flex-1 overflow-hidden">
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
             {loadingMessages ? (
               <div className="flex justify-center items-center h-full">
@@ -155,12 +158,13 @@ export default function Chat() {
             ) : messages.length === 0 ? (
               <EmptyState onPrompt={sendMessage} />
             ) : (
-              messages.map((msg) => <MessageBubble key={msg.id} message={msg} />)
+              messages.map((msg) => (
+                <MessageBubble key={msg.id} message={msg} />
+              ))
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Error banner */}
           {error && (
             <div className="mx-6 mb-2 border-l-4 border-red-400 bg-red-50 px-4 py-2 flex items-center justify-between">
               <p className="font-mono text-[10px] uppercase tracking-widest text-red-700">
@@ -175,8 +179,11 @@ export default function Chat() {
             </div>
           )}
 
-          {/* Input */}
-          <ChatInput onSend={sendMessage} disabled={loadingMessages} sending={sending} />
+          <ChatInput
+            onSend={sendMessage}
+            disabled={loadingMessages}
+            sending={sending}
+          />
         </div>
       </div>
     </div>

@@ -1,5 +1,3 @@
-// Mirrors backend Pydantic models exactly.
-
 export interface UserProfile {
   id: string;
   email: string;

@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSettings } from "../hooks/useSettings";
-import { PRESET_INTERESTS, TIMEZONES, MAX_INTERESTS } from "../data/onboardingData";
+import {
+  PRESET_INTERESTS,
+  TIMEZONES,
+  MAX_INTERESTS,
+} from "../data/onboardingData";
 import DotGrid from "../components/DotGrid";
 import SectionLabel from "../components/SectionLabel";
 import { TODAY } from "../lib/utils";
 
-// ─── Shared input style ───────────────────────────────────────────────────────
-
 const inputClass =
   "w-full font-mono text-sm bg-background border-2 border-text-primary px-4 py-2.5 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2";
-
-// ─── Interest chip ────────────────────────────────────────────────────────────
 
 function InterestChip({
   label,
@@ -88,14 +88,15 @@ function CustomInterestInput({
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function Settings() {
   const navigate = useNavigate();
-  const { user, form, loading, saveStatus, saveError, setForm, handleSave } = useSettings();
+  const { user, form, loading, saveStatus, saveError, setForm, handleSave } =
+    useSettings();
 
   const atLimit = form.interests.length >= MAX_INTERESTS;
-  const customInterests = form.interests.filter((i) => !PRESET_INTERESTS.includes(i));
+  const customInterests = form.interests.filter(
+    (i) => !PRESET_INTERESTS.includes(i),
+  );
 
   function toggleInterest(interest: string) {
     setForm((prev) => ({
@@ -122,13 +123,16 @@ export default function Settings() {
   }
 
   const saveLabel =
-    saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved ✓" : "Save Changes";
+    saveStatus === "saving"
+      ? "Saving…"
+      : saveStatus === "saved"
+        ? "Saved ✓"
+        : "Save Changes";
 
   return (
     <div className="min-h-screen bg-background text-text-primary font-sans antialiased">
       <DotGrid />
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="border-b-4 border-text-primary bg-background sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-8">
           <div className="flex items-center py-2">
@@ -143,7 +147,10 @@ export default function Settings() {
             <div>
               <h1
                 className="font-serif font-bold uppercase leading-none"
-                style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", letterSpacing: "-0.025em" }}
+                style={{
+                  fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+                  letterSpacing: "-0.025em",
+                }}
               >
                 Quorent
               </h1>
@@ -169,7 +176,6 @@ export default function Settings() {
               </button>
             </div>
           </div>
-
         </div>
       </header>
 
@@ -182,12 +188,15 @@ export default function Settings() {
         {loading ? (
           <div className="space-y-4 animate-pulse">
             {[100, 75, 90, 60].map((w, i) => (
-              <div key={i} className="h-3 bg-text-primary/10 rounded" style={{ width: `${w}%` }} />
+              <div
+                key={i}
+                className="h-3 bg-text-primary/10 rounded"
+                style={{ width: `${w}%` }}
+              />
             ))}
           </div>
         ) : (
           <div className="space-y-10">
-            {/* ── Account info (read-only) ─────────────────────────── */}
             <section>
               <SectionLabel color="bg-text-primary">Account</SectionLabel>
               <div className="grid grid-cols-2 gap-6">
@@ -203,16 +212,18 @@ export default function Settings() {
                   <p className="font-mono text-[9px] uppercase tracking-widest text-text-muted mb-1.5">
                     Email
                   </p>
-                  <p className="font-sans text-sm text-text-primary">{user?.email}</p>
+                  <p className="font-sans text-sm text-text-primary">
+                    {user?.email}
+                  </p>
                 </div>
               </div>
             </section>
 
-            {/* ── Interests ─────────────────────────────────────────── */}
             <section>
               <SectionLabel color="bg-accent">Your Interests</SectionLabel>
               <p className="font-sans text-sm text-text-muted leading-relaxed mb-6">
-                Choose up to {MAX_INTERESTS} topics. Your digest will be curated around these.
+                Choose up to {MAX_INTERESTS} topics. Your digest will be curated
+                around these.
               </p>
 
               <div className="flex flex-wrap gap-2 mb-6">
@@ -229,7 +240,10 @@ export default function Settings() {
 
               <Divider label="Custom topics" />
 
-              <CustomInterestInput disabled={atLimit} onAdd={addCustomInterest} />
+              <CustomInterestInput
+                disabled={atLimit}
+                onAdd={addCustomInterest}
+              />
 
               {customInterests.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-4">
@@ -263,11 +277,9 @@ export default function Settings() {
               </div>
             </section>
 
-            {/* ── Email digest ───────────────────────────────────────── */}
             <section>
               <SectionLabel color="bg-secondary">Email Digest</SectionLabel>
 
-              {/* Toggle */}
               <div className="flex items-center justify-between border-2 border-text-primary px-4 py-3 mb-6">
                 <div>
                   <p className="font-mono text-xs uppercase tracking-wider text-text-primary font-bold">
@@ -279,7 +291,12 @@ export default function Settings() {
                 </div>
                 <div className="flex shrink-0 border-2 border-text-primary overflow-hidden">
                   <button
-                    onClick={() => setForm((prev) => ({ ...prev, email_digest_enabled: true }))}
+                    onClick={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        email_digest_enabled: true,
+                      }))
+                    }
                     className={`font-mono text-[10px] uppercase tracking-wider px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary ${
                       form.email_digest_enabled
                         ? "bg-text-primary text-background"
@@ -290,7 +307,12 @@ export default function Settings() {
                   </button>
                   <div className="w-px bg-text-primary" />
                   <button
-                    onClick={() => setForm((prev) => ({ ...prev, email_digest_enabled: false }))}
+                    onClick={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        email_digest_enabled: false,
+                      }))
+                    }
                     className={`font-mono text-[10px] uppercase tracking-wider px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary ${
                       !form.email_digest_enabled
                         ? "bg-text-primary text-background"
@@ -311,7 +333,10 @@ export default function Settings() {
                     type="time"
                     value={form.preferred_digest_time}
                     onChange={(e) =>
-                      setForm((prev) => ({ ...prev, preferred_digest_time: e.target.value }))
+                      setForm((prev) => ({
+                        ...prev,
+                        preferred_digest_time: e.target.value,
+                      }))
                     }
                     className={inputClass}
                   />
@@ -345,12 +370,12 @@ export default function Settings() {
               </div>
             </section>
 
-            {/* ── Save bar ─────────────────────────────────────────── */}
             <div className="border-t-2 border-text-primary pt-6 flex items-center justify-between gap-6">
               <div>
                 {saveError && (
                   <p className="font-mono text-[10px] uppercase tracking-wider text-red-600 max-w-xs leading-relaxed">
-                    Could not save — {saveError.toLowerCase().replace(/^value error,\s*/i, "")}
+                    Could not save —{" "}
+                    {saveError.toLowerCase().replace(/^value error,\s*/i, "")}
                   </p>
                 )}
                 {saveStatus === "saved" && (
@@ -362,7 +387,9 @@ export default function Settings() {
 
               <button
                 onClick={handleSave}
-                disabled={saveStatus === "saving" || form.interests.length === 0}
+                disabled={
+                  saveStatus === "saving" || form.interests.length === 0
+                }
                 className="flex items-center gap-3 bg-text-primary text-background font-sans font-bold text-sm py-3.5 px-8 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_rgba(129,103,41,1)] active:translate-y-0 active:shadow-none disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 {saveStatus === "saving" && (

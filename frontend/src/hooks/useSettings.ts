@@ -45,7 +45,6 @@ export function useSettings(): UseSettingsReturn {
     });
   }, []);
 
-  // Load user and seed form
   useEffect(() => {
     if (!token) return;
     getUser(token)
@@ -54,7 +53,6 @@ export function useSettings(): UseSettingsReturn {
         setForm({
           interests: u.interests,
           email_digest_enabled: u.email_digest_enabled,
-          // Backend stores time as "HH:MM:SS"; validator only accepts "HH:MM"
           preferred_digest_time: u.preferred_digest_time.slice(0, 5),
           preferred_digest_timezone: u.preferred_digest_timezone,
         });
@@ -74,7 +72,6 @@ export function useSettings(): UseSettingsReturn {
       });
       setUser(updated);
       setSaveStatus("saved");
-      // Reset back to idle after 2.5s
       setTimeout(() => setSaveStatus("idle"), 2500);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Save failed.");
@@ -82,5 +79,14 @@ export function useSettings(): UseSettingsReturn {
     }
   }
 
-  return { token, user, form, loading, saveStatus, saveError, setForm, handleSave };
+  return {
+    token,
+    user,
+    form,
+    loading,
+    saveStatus,
+    saveError,
+    setForm,
+    handleSave,
+  };
 }
