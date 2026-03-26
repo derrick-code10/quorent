@@ -150,7 +150,8 @@ export default function Chat() {
         </div>
 
         <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+            <div className="mx-auto w-full max-w-3xl space-y-5">
             {loadingMessages ? (
               <div className="flex justify-center items-center h-full">
                 <span className="w-5 h-5 border-2 border-text-primary border-t-transparent rounded-full animate-spin" />
@@ -163,6 +164,7 @@ export default function Chat() {
               ))
             )}
             <div ref={messagesEndRef} />
+            </div>
           </div>
 
           {error && (
