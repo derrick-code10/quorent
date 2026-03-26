@@ -102,3 +102,23 @@ async def update_current_user_profile(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update user profile: {str(e)}"
         )
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_current_user_account(
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Permanently delete the current authenticated user's account.
+    This removes the auth user and cascades related application data.
+    """
+    user_id = current_user["id"]
+
+    try:
+        db.auth.admin.delete_user(user_id)
+        return None
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete account: {str(e)}"
+        )
