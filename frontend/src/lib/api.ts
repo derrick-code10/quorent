@@ -68,6 +68,12 @@ export function updateUser(
   });
 }
 
+export function deleteCurrentUser(token: string): Promise<void> {
+  return request<void>("/api/users/me", token, {
+    method: "DELETE",
+  });
+}
+
 export async function getArticles(
   token: string,
   params: { limit?: number; offset?: number } = {},
