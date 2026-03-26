@@ -10,7 +10,7 @@ class Message(BaseModel):
     conversation_id: str
     role: str  # 'user' or 'assistant'
     content: str
-    sources: Optional[dict] = None
+    sources: Optional[list[dict]] = None
     article_id: Optional[str] = None
     created_at: datetime
 
