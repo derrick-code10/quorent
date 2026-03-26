@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSettings } from "../hooks/useSettings";
+import { deleteCurrentUser } from "../lib/api";
+import { signOut } from "../lib/supabase";
 import {
   PRESET_INTERESTS,
   TIMEZONES,
@@ -90,8 +92,11 @@ function CustomInterestInput({
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { user, form, loading, saveStatus, saveError, setForm, handleSave } =
+  const { token, user, form, loading, saveStatus, saveError, setForm, handleSave } =
     useSettings();
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const atLimit = form.interests.length >= MAX_INTERESTS;
   const customInterests = form.interests.filter(
@@ -128,6 +133,27 @@ export default function Settings() {
       : saveStatus === "saved"
         ? "Saved ✓"
         : "Save Changes";
+
+  async function handleDeleteAccount() {
+    if (!token || deletingAccount) return;
+    if (deleteConfirmation.trim().toUpperCase() !== "DELETE") {
+      setDeleteError('Type "DELETE" to confirm account removal.');
+      return;
+    }
+
+    setDeleteError(null);
+    setDeletingAccount(true);
+    try {
+      await deleteCurrentUser(token);
+      await signOut();
+      navigate("/", { replace: true });
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error ? err.message : "Failed to delete account.",
+      );
+      setDeletingAccount(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background text-text-primary font-sans antialiased">
@@ -367,6 +393,46 @@ export default function Settings() {
                     </span>
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <section>
+              <SectionLabel color="bg-red-500">Danger Zone</SectionLabel>
+              <div className="border-2 border-red-500/70 bg-red-50/40 px-4 py-4">
+                <p className="font-mono text-xs uppercase tracking-wider text-red-700 font-bold mb-1.5">
+                  Delete account permanently
+                </p>
+                <p className="font-sans text-sm text-text-primary leading-relaxed mb-4">
+                  This action cannot be undone. Your profile, conversations,
+                  messages, articles, and related records will be permanently
+                  removed.
+                </p>
+
+                <label className="block font-mono text-[9px] uppercase tracking-widest text-text-muted mb-2">
+                  Type DELETE to confirm
+                </label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    value={deleteConfirmation}
+                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                    placeholder="DELETE"
+                    disabled={deletingAccount}
+                    className="flex-1 font-mono text-sm bg-background border-2 border-red-400 px-4 py-2.5 text-text-primary placeholder:text-text-muted/40 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 disabled:opacity-50"
+                  />
+                  <button
+                    onClick={handleDeleteAccount}
+                    disabled={deletingAccount}
+                    className="font-mono text-[10px] uppercase tracking-wider px-5 py-2.5 border-2 border-red-600 bg-red-600 text-white transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_rgba(185,28,28,0.45)] disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2"
+                  >
+                    {deletingAccount ? "Deleting..." : "Delete Account"}
+                  </button>
+                </div>
+                {deleteError && (
+                  <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-red-700">
+                    {deleteError}
+                  </p>
+                )}
               </div>
             </section>
 
